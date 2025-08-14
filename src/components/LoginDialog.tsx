@@ -1,184 +1,92 @@
 import React, { useState } from "react";
-import {
-  useConnectWithOtp,
-  useEmbeddedWallet,
-  useDynamicContext,
-} from "@dynamic-labs/sdk-react-core";
-import "./LoginDialog.css";
+import { useConnectWithOtp, useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
-interface LoginDialogProps {
-  onClose?: () => void;
-}
+import EmailStep from "./auth/EmailStep";
+import OtpStep from "./auth/OtpStep";
+import LoadingStep from "./auth/LoadingStep";
 
-const LoginDialog: React.FC<LoginDialogProps> = () => {
+const LoginDialog: React.FC = () => {
+  const [step, setStep] = useState<'email' | 'otp' | 'loading'>('email');
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [waitingForOtp, setWaitingForOtp] = useState(false);
-  const [waitingForAuth, setWaitingForAuth] = useState(false);
   const [error, setError] = useState("");
-
-  const dynamicContext = useDynamicContext();
-  const { sdkHasLoaded } = dynamicContext;
-  const { createEmbeddedWallet } = useEmbeddedWallet();
+  const { sdkHasLoaded } = useDynamicContext();
   const { connectWithEmail, verifyOneTimePassword } = useConnectWithOtp();
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
+  const handleEmailSubmit = async (submittedEmail: string) => {
+    if (!submittedEmail.trim()) {
       setError("Please enter your email address.");
       return;
     }
-
     setIsLoading(true);
-    setWaitingForOtp(true);
     setError("");
-
     try {
-      console.log("Sending verification code to:", email);
-      await connectWithEmail(email);
-      setIsLoading(false);
+      await connectWithEmail(submittedEmail);
+      setStep('otp');
     } catch (err: unknown) {
-      console.error("Email login error:", err);
-      setError(
-        (err as Error).message ||
-          "Failed to send verification code. Please try again."
-      );
+      setError((err as Error).message || "Failed to send verification code. Please try again.");
+    } finally {
       setIsLoading(false);
-      setWaitingForOtp(false);
     }
   };
 
-  const handleVerificationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!verificationCode.trim()) {
+  const handleOtpSubmit = async (code: string) => {
+    if (!code.trim()) {
       setError("Please enter the verification code.");
       return;
     }
-
     setIsLoading(true);
-    setWaitingForAuth(true);
-    setWaitingForOtp(false);
     setError("");
-
     try {
-      console.log("Verifying code:", verificationCode, "for email:", email);
-
-      await verifyOneTimePassword(verificationCode);
-      await createEmbeddedWallet();
-
-      setIsLoading(false);
-      setWaitingForAuth(false);
-      console.log("Email verification and wallet creation successful!");
+      await verifyOneTimePassword(code);
+      setStep('loading');
     } catch (err: unknown) {
-      console.error("Verification error:", err);
-      setError(
-        (err as Error).message || "Invalid verification code. Please try again."
-      );
+      setError((err as Error).message || "Invalid verification code. Please try again.");
+    } finally {
       setIsLoading(false);
-      setWaitingForAuth(false);
-      setWaitingForOtp(true); // Go back to OTP waiting state
     }
   };
 
   if (!sdkHasLoaded) {
     return (
-      <div className="login-overlay">
-        <div className="login-dialog">
-          <div className="loading">Loading SDK...</div>
-        </div>
+      <div className="bg-primary-foreground container grid h-svh max-w-none items-center justify-center">
+        <div className="text-lg font-semibold">Loading SDK...</div>
       </div>
     );
   }
 
-  return (
-    <div className="login-overlay">
-      <div className="login-dialog">
-        <div className="login-header">
-          <h2>Log In to wallet</h2>
-          {waitingForOtp && !waitingForAuth && (
-            <button
-              className="back-button"
-              onClick={() => {
-                setWaitingForOtp(false);
-                setError("");
-              }}
-              disabled={isLoading}
-            >
-              ← Back
-            </button>
-          )}
-        </div>
-
-        {!waitingForOtp && (
-          <form onSubmit={handleEmailSubmit} className="login-form">
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <button
-              type="submit"
-              className="login-button"
-              disabled={isLoading || !email.trim()}
-            >
-              {isLoading ? "Sending..." : "Log In"}
-            </button>
-          </form>
-        )}
-
-        {waitingForOtp && !waitingForAuth && (
-          <form onSubmit={handleVerificationSubmit} className="login-form">
-            <div className="verification-info">
-              <p>We sent a verification code to {email}.</p>
-              <p>Please check your email and enter the verification code.</p>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="code">Verification Code</label>
-              <input
-                id="code"
-                type="text"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                placeholder="123456"
-                disabled={isLoading}
-                maxLength={6}
-                required
-              />
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <button
-              type="submit"
-              className="login-button"
-              disabled={isLoading || !verificationCode.trim()}
-            >
-              {isLoading ? "Verifying..." : "Verify"}
-            </button>
-          </form>
-        )}
-
-        {waitingForAuth && (
-          <div className="loading-state">
-            <p>Creating your wallet...</p>
-            <div className="loading">Please wait...</div>
+    return (
+      <div className='bg-primary-foreground container grid h-svh max-w-none items-center justify-center'>
+        <div className='mx-auto flex w-full flex-col justify-center space-y-2 py-8 sm:w-[480px] sm:p-8'>
+          <div className='mb-4 flex items-center justify-center'>
+            <img className='size-16' src='/src/assets/logo.png' alt='Logo' />
+            <h1 className='text-3xl ml-4 font-extrabold'>Web3 Message Signer</h1>
           </div>
-        )}
+          {step === 'email' && (
+            <EmailStep
+              email={email}
+              setEmail={setEmail}
+              isLoading={isLoading}
+              error={error}
+              onSubmit={handleEmailSubmit}
+            />
+          )}
+          {step === 'otp' && (
+            <OtpStep
+              email={email}
+              verificationCode={verificationCode}
+              setVerificationCode={setVerificationCode}
+              isLoading={isLoading}
+              error={error}
+              onBack={() => { setStep('email'); setVerificationCode(""); setError(""); }}
+              onSubmit={handleOtpSubmit}
+            />
+          )}
+          {step === 'loading' && <LoadingStep />}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default LoginDialog;
