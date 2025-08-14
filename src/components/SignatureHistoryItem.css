@@ -79,6 +79,27 @@
   transform: translateY(-1px);
 }
 
+.signer-info {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.signer-info strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.signer-address {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #a7f3d0;
+  margin-left: 8px;
+}
+
 .signature-text {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 12px;
@@ -120,4 +141,14 @@
   background-color: #7f1d1d;
   color: #fca5a5;
   border-color: #dc2626;
+}
+
+.dark .signer-info strong {
+  color: #d1d5db;
+}
+
+.dark .signer-address {
+  color: #6ee7b7;
+  background: #064e3b;
+  border-color: #047857;
 }

@@ -6,6 +6,7 @@ interface SignatureHistoryItemProps {
   signature: string;
   timestamp: string;
   isVerified?: boolean;
+  verifiedSigner?: string;
   onVerify?: () => void;
 }
 
@@ -14,6 +15,7 @@ const SignatureHistoryItem: React.FC<SignatureHistoryItemProps> = ({
   signature,
   timestamp,
   isVerified = false,
+  verifiedSigner,
   onVerify
 }) => {
   return (
@@ -26,7 +28,12 @@ const SignatureHistoryItem: React.FC<SignatureHistoryItemProps> = ({
       </div>
       <div className="history-signature">
         <div className="signature-header">
-          <strong>Signature:</strong>
+          <strong>
+            Signature:
+            {isVerified && verifiedSigner && (
+              <span className="signer-address">{verifiedSigner}</span>
+            )}
+          </strong>
           <div className="signature-actions">
             <span className={`verification-badge ${isVerified ? 'verified' : 'not-verified'}`}>
               {isVerified ? 'Verified' : 'Not Verified'}

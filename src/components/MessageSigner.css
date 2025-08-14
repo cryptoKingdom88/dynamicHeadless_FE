@@ -24,12 +24,45 @@
   color: #1f2937;
 }
 
+.user-email,
+.wallet-address-info {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.user-email strong,
+.wallet-address-info strong {
+  color: #374151;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.email-address {
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #bfdbfe;
+  font-size: 13px;
+}
+
 .wallet-address {
-  margin: 0;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #a7f3d0;
+  word-break: break-all;
+}
+
+/* Fallback for unknown wallet */
+.wallet-info p.wallet-address {
+  margin: 0;
+  font-family: inherit;
   font-size: 14px;
   color: #6b7280;
-  word-break: break-all;
   background: #f9fafb;
   padding: 8px 12px;
   border-radius: 6px;
@@ -152,11 +185,35 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.message-history .history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .message-history h4 {
-  margin: 0 0 16px 0;
+  margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: #1f2937;
+}
+
+.clear-history-button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-history-button:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
 }
 
 .history-list {
@@ -179,7 +236,32 @@
   color: white;
 }
 
+.dark .clear-history-button {
+  background: #ef4444;
+}
+
+.dark .clear-history-button:hover {
+  background: #dc2626;
+}
+
+.dark .user-email strong,
+.dark .wallet-address-info strong {
+  color: #d1d5db;
+}
+
+.dark .email-address {
+  color: #93c5fd;
+  background: #1e3a8a;
+  border-color: #3b82f6;
+}
+
 .dark .wallet-address {
+  color: #6ee7b7;
+  background: #064e3b;
+  border-color: #047857;
+}
+
+.dark .wallet-info p.wallet-address {
   background: #374151;
   border-color: #4b5563;
   color: #d1d5db;
