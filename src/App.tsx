@@ -1,12 +1,11 @@
 
-import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import LoginDialog from "./components/LoginDialog";
 import MessageSigner from "./components/MessageSigner";
 import "./App.css";
 
 
 function App() {
-  const { handleLogOut } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
 
   return (
@@ -14,9 +13,7 @@ function App() {
       {!isLoggedIn ? (
         <LoginDialog />
       ) : (
-        <>
-          <MessageSigner />
-        </>
+        <MessageSigner />
       )}
     </div>
   );
